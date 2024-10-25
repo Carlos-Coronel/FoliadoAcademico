@@ -1,0 +1,11 @@
+{
+    "apps": [{
+        "name": "app-pdf",
+        "script": "/home/app/foliado/venv/bin/python",
+        "args": ["server.py"],
+        "cwd": "/home/app/foliado",
+        "exec_mode": "fork",
+        "wait_ready": true,
+        "cron_restart": "59 23 * * *"
+    }]
+}
