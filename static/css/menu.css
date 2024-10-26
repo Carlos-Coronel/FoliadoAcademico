@@ -1,0 +1,170 @@
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap');
+
+body {
+    font-family: "Montserrat", sans-serif;
+    margin: 0;
+    padding: 0;
+}
+
+form {
+    max-width: 1000px;
+    margin: 120px auto;
+    background: #fefefe;
+    padding: 40px;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+select, button {
+    padding: 10px;
+    margin: 5px 0;
+    width: 100%;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    box-sizing: border-box;
+}
+
+select {
+    width: 50%;
+}
+
+button {
+    background-color: #4caf50;
+    color: white;
+    cursor: pointer;
+}
+
+button:hover {
+    background-color: #45a049;
+}
+
+legend {
+    text-align: center;
+    font-weight: bold;
+}
+
+body {
+    margin: 0 auto; /* Para centrar el formulario */
+    /* Para centrar el texto dentro del formulario */
+}
+
+fieldset {
+    font-size: 18px;
+    border: none;
+}
+
+button {
+    margin-top: 10px; /* Espacio entre elementos */
+}
+
+#div-materias {
+
+    border: 1px solid rgba(0, 0, 0, 0.384);
+    border-radius: 15px;
+    vertical-align: top
+}
+
+.logo-left, .logo-right {
+    width: 100px; /* Ancho de la imagen */
+    height: 100px; /* Alto de la imagen */
+    margin-top: 10px; /* Espacio entre la imagen y el título */
+}
+
+.logo-right {
+    float: right; /* Alinea a la derecha */
+    margin-left: 10px; /* Espacio entre la imagen y el título */
+}
+
+#checkboxContainer {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr); /* Dos columnas de igual tamaño */
+    gap: 0; /* Sin espacio entre los divs */
+    justify-items: center; /* Centra los elementos en cada celda */
+}
+
+#checkboxContainer div {
+    padding: 10px;
+    margin-bottom: 10px;
+    width: 98%;
+    box-sizing: border-box; /* Incluye padding y border en el width */
+}
+
+#cboCarrera {
+    display: block; /* Convertir el select en un elemento de bloque */
+    margin: 0 auto; /* Margen automático para centrar horizontalmente */
+}
+
+#checkboxContainer > div > fieldset > input {
+    width: 12px; /* Anchura del checkbox */
+    height: 12px; /* Altura del checkbox */
+    transform: scale(1.5); /* Escala del checkbox */
+    -webkit-transform: scale(1.5); /* Escala del checkbox para navegadores WebKit */
+    margin-right: 8px; /* Espaciado a la derecha del checkbox */
+    margin-left: 5px; /* Espaciado a la derecha del checkbox */
+}
+
+.navbar {
+    background-color: white;
+    position: fixed;
+    top: 0;
+    width: 100%;
+    transition: top 0.3s;
+    z-index: 1000;
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+}
+
+.navbar-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 20px;
+}
+
+.navbar-nav {
+    list-style: none;
+    display: flex;
+    margin: 0;
+    padding: 0;
+}
+
+.navbar-nav li {
+    margin-left: 20px;
+}
+
+.navbar-nav a {
+    text-decoration: none;
+    color: black;
+    font-weight: bold;
+}
+
+.navbar-hidden {
+    top: -80px; /* Ajusta este valor según la altura de tu navbar */
+}
+
+main {
+    padding-top: 70px; /* Ajusta este valor según la altura de tu navbar */
+}
+
+/*boton de imprimir*/
+.button-container {
+    position: relative;
+    height: 100px; /* Ajusta según tu diseño */
+}
+
+.filtrarBtn {
+    background-color: #007bff;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    font-size: 16px;
+    cursor: pointer;
+    border-radius: 4px;
+    transition: all 0.3s ease; /* Transición suave para la visibilidad */
+}
+
+.fixed {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+}

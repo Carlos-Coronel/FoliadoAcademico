@@ -1,6 +1,6 @@
 {% load static %}
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,32 +8,136 @@
     <script src="https://unpkg.com/pagedjs/dist/paged.polyfill.js"></script>
     <script src="{% static 'js/pagedjs_custom.js' %}"></script>
     <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+    <style>
+        /* Estilos generales */
+        body {
+            font-family: Arial, sans-serif;
+            font-size: 12px;
+            line-height: 1.15;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background-color: #f8f9fa;
+        }
+
+        /* Estilo para títulos */
+        h2 {
+            font-size: 14px;
+            margin-bottom: 10px;
+        }
+
+        /* Estilo para párrafos */
+        p {
+            font-size: 12px;
+            margin-bottom: 15px;
+            text-align: justify;
+
+        }
+
+        /* Estilo para la tabla de identificación */
+        .identification-table table {
+            margin: 10px 0;
+            border-collapse: collapse;
+            width: 100%;
+        }
+
+        .identification-table td {
+            border: 1px solid #ddd;
+            padding: 8px;
+        }
+
+        /* Estilo para secciones */
+        .nivel-1 {
+            margin-left: 0;
+            font-weight: bold;
+        }
+
+        .nivel-2 {
+            margin-left: 40px;
+            text-indent: -24px;
+        }
+
+
+        .iv-contenido {
+            text-align: left; /* Sobrescribe text-align: justify para IV.CONTENIDO */
+        }
+
+    </style>
 </head>
 <body>
 <!-- Contenedor de la hoja -->
 <div class="sheet-container">
     <!-- Contenido -->
-    <div class="content">
-        <!-- Contenido de la página 1 -->
-        <div class="page">
-            <h2>Identificación</h2>
-            <div class="identification-table">
-                <p><span>A. Nombre de la Materia</span>:{{ identificacion.materia }}</p>
-                <p><span>B. Código</span>:{{ identificacion.codigo }}</p>
-                <p><span>C. Condición</span>:{{ identificacion.condicion }}</p>
-                <p><span>D. Carrera</span>:{{ identificacion.carrera }}</p>
-                <p><span>E. Curso</span>:{{ identificacion.curso }}</p>
-                <p><span>F. Semestre</span>:{{ identificacion.semestre }}</p>
-                <p><span>G. Requisitos</span>:{{ identificacion.requisitos }}</p>
-                <p><span>H. Cargar horaria semanal</span>:{{ identificacion.cargaSemanal }}</p>
-                <p><span>I. Cargar horaria semestral</span>:{{ identificacion.cargaSemestral }}</p>
+    {% for identificacion_data in identificaciones %}
+        <div class="content">
+            <!-- Contenido de la página 1 -->
+            <div class="page">
+                <h2>I.IDENTIFICACIÓN.</h2>
+                <div class="identification-table">
+                    <table>
+                        <tr>
+                            <td>A. Nombre de la Materia</td>
+                            <td>{{ identificacion_data.identificacion.materia }}</td>
+                        </tr>
+                        <tr>
+                            <td>B. Código</td>
+                            <td>{{ identificacion_data.identificacion.codigo }}</td>
+                        </tr>
+                        <tr>
+                            <td>C. Condición</td>
+                            <td>{{ identificacion_data.identificacion.condicion }}</td>
+                        </tr>
+                        <tr>
+                            <td>D. Carrera</td>
+                            <td>{{ identificacion_data.identificacion.carrera }}</td>
+                        </tr>
+                        <tr>
+                            <td>E. Curso</td>
+                            <td>{{ identificacion_data.identificacion.curso }}</td>
+                        </tr>
+                        <tr>
+                            <td>F. Semestre</td>
+                            <td>{{ identificacion_data.identificacion.semestre }}</td>
+                        </tr>
+                        <tr>
+                            <td>G. Requisitos</td>
+                            <td>{{ identificacion_data.identificacion.requisitos }}</td>
+                        </tr>
+                        <tr>
+                            <td>H. Carga horaria semanal</td>
+                            <td>{{ identificacion_data.identificacion.cargaSemanal }}</td>
+                        </tr>
+                        <tr>
+                            <td>I. Carga horaria semestral</td>
+                            <td>{{ identificacion_data.identificacion.cargaSemestral }}</td>
+                        </tr>
+                    </table>
+                </div>
+
+                {% for seccion_titulo, seccion_contenido in identificacion_data.secciones.items %}
+                    <h2>{{ seccion_titulo }}</h2>
+                    {% if seccion_titulo == "IV.CONTENIDO." %}
+                        <div class="iv-contenido">
+                            {% for item in seccion_contenido %}
+                                <p class="nivel-{{ item.nivel }}">{{ item.texto }}</p>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <p>{{ seccion_contenido|safe }}</p>
+                    {% endif %}
+
+                    {% if forloop.last %}
+                        <!-- Salto de página después del último ciclo -->
+                        <div class="page-break"></div>
+                    {% endif %}
+                {% endfor %}
+
             </div>
-            {% for seccion_titulo, seccion_contenido in secciones.items %}
-                <h2>{{ seccion_titulo }}</h2>
-                <p>{{ seccion_contenido|safe }}</p>
-            {% endfor %}
         </div>
-    </div>
+    {% endfor %}
 </div>
 
 </body>

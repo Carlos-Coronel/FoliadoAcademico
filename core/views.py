@@ -1,27 +1,14 @@
 import pdfplumber
 from django.shortcuts import render, redirect
-from .models import PDF, Carrera
+from .models import PDF
 from io import BytesIO
 from unidecode import unidecode
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 from django.template.loader import render_to_string
 
 
 def import_success(request):
     return render(request, 'import_success.html')
-
-
-def carrera_pdf_list(request):
-    carreras = Carrera.objects.all()
-    pdfs = PDF.objects.none()
-    selected_carrera_id = request.GET.get('id_carrera')
-
-    if selected_carrera_id:
-        selected_carrera = Carrera.objects.get(pk=selected_carrera_id)
-        pdfs = PDF.objects.filter(id_carrera=selected_carrera)
-
-    return render(request, 'carrera_pdf_list.html',
-                  {'carreras': carreras, 'pdfs': pdfs, 'selected_carrera_id': selected_carrera_id})
 
 
 def procesar_lista(contenido):
@@ -59,38 +46,72 @@ def procesar_lista(contenido):
     return html_contenido
 
 
-def pdf_to_html(request):
-    pdf_id = request.GET.get('pdf_id')
-    if pdf_id:
-        # Obtener el objeto PDF correspondiente a la ID proporcionada
-        pdf_instance = PDF.objects.get(id=pdf_id)
-        identificacion = {
-            'nombre': pdf_instance.nombre,
-            'materia': pdf_instance.materia,
-            'codigo': pdf_instance.codigo,
-            'condicion': pdf_instance.condicion,
-            'carrera': pdf_instance.carrera,
-            'curso': pdf_instance.curso,
-            'semestre': pdf_instance.semestre,
-            'requisitos': pdf_instance.requisitos,
-            'cargaSemanal': pdf_instance.cargaSemanal,
-            'cargaSemestral': pdf_instance.cargaSemestral,
-        }
-        secciones = {
-            'Fundamentacion': pdf_instance.fundamentacion,
-            'Objetivos': procesar_lista(pdf_instance.objetivos),
-            'Contenido': pdf_instance.contenido.replace('\n', '<br>'),
-            'Metodologia': procesar_lista(pdf_instance.metodologia),
-            'Evaluacion': pdf_instance.evaluacion.replace('\n', '<br>'),
-            'Bibliografia': procesar_lista(pdf_instance.bibliografia),
-        }
+def procesar_contenido(contenido):
+    lineas = contenido.splitlines()
+    resultado = []
+    current_line = {'texto': '', 'nivel': 3}  # Inicializar con nivel 3
 
-        html_content = render_to_string('pdf_to_html_template.html',
-                                        {'nombre_archivo': pdf_instance.nombre, 'identificacion': identificacion,
-                                         'secciones': secciones})
-        return HttpResponse(html_content)
+    for linea in lineas:
+        if linea.strip():
+            linea_limpia = linea.strip()
+            resultado.append(current_line)
+            current_line = {'texto': linea_limpia, 'nivel': 1 if linea_limpia.isupper() else 2}
+
+    resultado.append(current_line)
+    return resultado[1:]  # Eliminar el primer elemento inicializado vacío
+
+
+def pdf_to_html(request):
+    pdf_ids = request.GET.getlist('pdf_id')
+    print(pdf_ids)  # Obtener lista de IDs de PDF
+    if pdf_ids:
+        identificaciones = []
+        for pdf_id in pdf_ids:
+            try:
+                # Obtener el objeto PDF correspondiente a la ID proporcionada
+                pdf_instance = PDF.objects.get(id=pdf_id)
+
+                # Obtener el texto de evaluación si existe
+                evaluacion_texto = ""
+                if pdf_instance.evaluacion:
+                    evaluacion_texto = pdf_instance.evaluacion.descripcion.replace('\n', '<br>')
+
+                identificacion = {
+                    'nombre': pdf_instance.nombre,
+                    'materia': pdf_instance.materia,
+                    'codigo': pdf_instance.codigo,
+                    'condicion': pdf_instance.condicion,
+                    'carrera': pdf_instance.carrera,
+                    'curso': pdf_instance.curso.nombre if pdf_instance.curso else "",
+                    'semestre': pdf_instance.semestre.nombre if pdf_instance.semestre else "",
+                    'requisitos': pdf_instance.requisitos,
+                    'cargaSemanal': pdf_instance.cargaSemanal,
+                    'cargaSemestral': pdf_instance.cargaSemestral,
+                }
+                secciones = {
+                    'II.FUNDAMENTACIÓN.': pdf_instance.fundamentacion,
+                    'III.OBJETIVOS.': procesar_lista(pdf_instance.objetivos),
+                    'IV.CONTENIDO.': procesar_contenido(pdf_instance.contenido),
+                    'V.METODOLOGÍA.': procesar_lista(pdf_instance.metodologia),
+                    'VI.EVALUACIÓN': evaluacion_texto,
+                    'VII.BIBLIOGRAFÍA.': procesar_lista(pdf_instance.bibliografia),
+                }
+                identificaciones.append({'identificacion': identificacion, 'secciones': secciones})
+                print("Nombre: ", pdf_instance.nombre)
+                print("Materia: ", pdf_instance.materia)
+            except PDF.DoesNotExist:
+                pass  # Manejar la situación en la que el PDF no existe
+
+        # Ordenar identificaciones por el campo 'codigo'
+        identificaciones.sort(key=lambda x: x['identificacion']['codigo'])
+
+        if identificaciones:
+            html_content = render_to_string('pdf_to_html_template.html', {'identificaciones': identificaciones})
+            return HttpResponse(html_content)
+        else:
+            return HttpResponse("No se encontraron PDFs con las IDs proporcionadas.")
     else:
-        return HttpResponse("No se proporcionó ninguna ID de PDF.")
+        return HttpResponse("No se proporcionaron IDs de PDF.")
 
 
 def eliminar_encabezados_pies_pagina(page):
@@ -115,7 +136,8 @@ def eliminar_encabezados_pies_pagina(page):
             # Si la línea comienza con "Página ", la ignoramos
             continue
 
-    # Eliminar la frase "Carrera de Ingeniería en Informática Facultad de Ciencias Tecnológicas – UNC@" si aparece como una frase completa
+    # Eliminar la frase "Carrera de Ingeniería en Informática Facultad de Ciencias Tecnológicas – UNC@" si aparece
+    # como una frase completa
     page_text_filtered = [
         line.replace("Carrera de Ingeniería en Informática Facultad de Ciencias Tecnológicas – UNC@", "") for line in
         page_text_filtered]
@@ -277,3 +299,18 @@ def extraer_valor(linea_actual, linea_siguiente):
             return valor_siguiente
 
     return None
+
+
+def get_materiasf(request, codcarrera):
+    print(codcarrera)
+    materias = list(PDF.objects.filter(codigo__icontains=codcarrera).values())
+    if len(materias) <= 0:
+        data = {'message': "Not Found"}
+    else:
+        data = {'message': "Success", 'materias': materias}
+
+    return JsonResponse(data)
+
+
+def menu(request):
+    return render(request, 'menu.html', )

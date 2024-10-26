@@ -11,6 +11,9 @@ body {
     background-color: #f8f9fa;
 }
 
+.page-break {
+    break-after: page;
+}
 
 /* Estilos para la página */
 @page {
@@ -36,7 +39,6 @@ body {
 
 @page :nth(n+2) {
     margin-top: 11.5mm;
-
     @top-center {
         content: element(header2);
     }
@@ -138,7 +140,7 @@ a:hover {
 /* Estilo para la tabla de identificación */
 .identification-table {
     display: flex;
-    flex-direction: column;
+    flex-directin: column;
 }
 
 /* Estilo para el título */
@@ -146,4 +148,3 @@ a:hover {
     width: 200px;
     display: inline-block;
 }
-

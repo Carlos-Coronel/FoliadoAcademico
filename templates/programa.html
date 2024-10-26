@@ -1,0 +1,226 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Imprimir PDF</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            font-size: 12px;
+            text-align: center;
+        }
+        #identificacion, #Fundamentacion, #Objetivos, #Contenido, #Metodologia, #Evaluacion, #Bibliografia {
+            margin: 0 auto;
+            width: 80%;
+            text-align: left;
+        }
+        #identificacion p {
+            margin: 0;
+            text-align: left;
+             padding-left: 50px;
+        }
+
+                header {
+            text-align: center;
+        }
+
+        header h1, header h2, header h3, header p {
+
+        }
+        #container{
+            width: 794px;
+            height: 1123px;
+            background-color: #f0f0f5;
+
+            border: 1px solid black;
+        }
+    #Fundamentacion p {
+        line-height: 1.5; /* Ajusta este valor según tus necesidades */
+        text-align: justify;
+    }
+ #Objetivos p {
+    white-space: pre-wrap;
+    padding-left: 80px;
+     line-height: 1.5;
+     text-align: justify;
+}
+  #Contenido p {
+    white-space: pre-wrap;
+    padding-left: 80px;
+     line-height: 1.5;
+     text-align: justify;
+}
+      #Metodologia p {
+        line-height: 1.5;
+        text-align: justify;
+          white-space: pre-wrap
+    }
+      #Evaluacion p{
+          line-height: 1.5;
+        text-align: justify;
+          white-space: pre-wrap
+      }
+      #Bibliografia p{
+                    line-height: 1.5;
+        text-align: justify;
+          white-space: pre-wrap
+      }
+        body {
+    border: 2px solid black;
+    padding: 20px;
+   width: 80%;
+}
+             .linea {
+            border-bottom: 2px solid black;
+            width: 80%;
+            margin: auto;
+            margin-bottom: 20px;
+        }
+
+    #identificacion table td:first-child {
+        width: 350px; /* Puedes ajustar este valor según tus necesidades */
+    }
+
+    </style>
+</head>
+<body>
+
+
+    <header>
+        <h1>UNIVERSIDAD NACIONAL DEL CAAGUAZÚ</h1>
+        <p>Con Sede en Coronel Oviedo</p>
+        <h2>FACULTAD DE CIENCIAS Y TECNOLOGÍAS</h2>
+        <h3>CARRERA DE {{ pdf.carrera | upper }}</h3>
+        <h3>PLAN CURRICULAR 2010</h3>
+        <p>PROGRAMA DE ESTUDIOS</p>
+        <div class="linea"></div>
+        </header>
+
+
+<div id="identificacion">
+    <h1>I. IDENTIFICACIÓN</h1>
+    <table >
+        <tr>
+            <td>A. Nombre de la Materia</td>
+            <td>: {{ pdf.materia }}</td>
+        </tr>
+        <tr>
+            <td>B. Código</td>
+            <td>: {{ pdf.codigo }}</td>
+        </tr>
+        <tr>
+            <td>C. Condición</td>
+            <td>: {{ pdf.condicion }}</td>
+        </tr>
+        <tr>
+            <td>E. Carrera</td>
+            <td>: {{ pdf.carrera }}</td>
+        </tr>
+        <tr>
+            <td>E. Curso</td>
+            <td>: {{ pdf.curso }}</td>
+        </tr>
+        <tr>
+            <td>F. Semestre</td>
+            <td>: {{ pdf.semestre }}</td>
+        </tr>
+        <tr>
+            <td>G. Requisitos</td>
+            <td>: {{ pdf.requisitos }}</td>
+        </tr>
+        <tr>
+            <td>H. Carga horaria semanal</td>
+            <td>: {{ pdf.carga_Horaria_Semanal }}</td>
+        </tr>
+        <tr>
+            <td>I.  Carga horaria semestral</td>
+            <td>: {{ pdf.carga_Horaria_Semestral }}</td>
+        </tr>
+    </table>
+
+</div>
+    <P style="text-align: center">OB: Obligatoria - OBC: Obligatoria Complementaria - OPT: Optativa</P>
+
+
+    <div id="Fundamentacion">
+        <h1>II.    FUNDAMENTACIÓN</h1>
+        <p style="font-size: 13px">{{ pdf.fundamentacion }}</p>
+    </div>
+    <div id="Objetivos">
+        <h1>III.            OBJETIVOS</h1>
+        <p style="font-size: 13px">{{ pdf.objetivos }}</p>
+    </div>
+    <div id="Contenido">
+        <h1>IV.    CONTENIDO</h1>
+        <p>{{ pdf.contenido }}</p>
+    </div>
+
+
+
+    <div id="Metodologia">
+        <h1>V.    METODOLOGÍA</h1>
+        <p>{{ pdf.metodologia}}</p>
+    </div>
+    <div id="Evaluacion">
+        <h1>VI.    EVALUACIÓN</h1>
+        <p>El sistema de evaluación del aprendizaje de los estudiantes de la Facultad de
+Ciencias y Tecnologías de la Universidad Nacional de Caaguazú, consta de dos
+fases:
+1. Evaluación procesual sumatoria, con una carga del (60%) sesenta por
+ciento del puntaje total posible por semestre;
+2. Evaluación Final Global, con una carga del (40%) cuarenta por ciento del
+            puntaje total posible en la final semestral.</p>
+
+<p>La evaluación procesual sumatoria estará regida por los programas de estudio de
+cada materia y contará con diferentes estrategias de evaluación, que podrán ser:
+trabajos prácticos, de investigación, extensión universitaria, revisión bibliográfica,
+    giras ed ucativas, pasantías, pruebas parciales.</p>
+
+<p>El sistema de evaluación de la FCyT consta de dos fases: La evaluación
+procesual sumatoria y la evaluación final global. La evaluación procesual
+sumatoria equivale al 60% y la evaluación final global equivale al 40 % del total
+    acumulable de puntos.</p>
+
+<p>Los criterios de evaluación durante el proceso podrán basarse en las siguientes
+actividades y se llevarán a cabo durante el periodo lectivo:
+a) Las pruebas parciales , que deberán ser dos como mínimo según los
+criterios del profesor de cada materia.
+b) Las giras educativas, visitas técnicas, trabajo de campo , que podrán ser
+reemplazados por evaluaciones parciales en caso de que no hayan sido
+factibles su realización.
+c) Las revisiones bibliográficas, con presentación escrita y defensa oral de
+los mismos.
+d) Trabajos Prácticos con presentación oral y escrita (práctica inherente a
+cada materia).
+La distribución de los puntos del proceso (60%) se hará conforme al siguiente
+cuadro:<p>
+        <table style="border: 1px solid black; border-collapse: collapse;">
+    <tr>
+        <td style="border: 1px solid black; padding: 5px;">Eventos</td>
+        <td style="border: 1px solid black; padding: 5px;">Carga porcentual</td>
+    </tr>
+    <tr>
+        <td style="border: 1px solid black; padding: 5px;">Examenes Parciales</td>
+        <td style="border: 1px solid black; padding: 5px;">Mínimo 45%</td>
+    </tr>
+    <tr>
+        <td style="border: 1px solid black; padding: 5px;">Laboratorios / Pruebas Sumativas</td>
+        <td style="border: 1px solid black; padding: 5px;">Aplicación a criterio del docente, como máximo 15%</td>
+    </tr>
+</table>
+        <p>Para la habilitación al examen final global, el estudiante deberá lograr, como
+mínimo el 60% de los puntos acumulables en la evaluación procesual sumatoria.
+Cuando el estudiante reúna un mínimo del 40% de la evaluación procesual
+sumatoria, tendrá derecho hasta a dos exámenes de recuperación.</p>
+
+    </div>
+    <div id="Bibliografia">
+        <h1>VII.    BIBLIOGRAFÍA</h1>
+        <p>{{ pdf.bibliografia}}</p>
+    </div>
+
+</body>
+</html>
