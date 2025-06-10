@@ -38,10 +38,9 @@
     <h3 style="text-align: center">Selecciona una Carrera</h3>
     <br>
     <select id="cboCarrera" name="idCarrera">
-        <option value="KTII">Informática</option>
-        <option value="KTIC">Civil</option>
-        <option value="KTIL">Electrónica</option>
-        <option value="KTIE">Electricidad</option>
+        {% for carrera in carreras %}
+            <option value="{{ carrera.cod_carrera }}">{{ carrera.nombre }}</option>
+        {% endfor %}
     </select>
     <br>
     <div id="checkboxContainer"></div> <!-- Contenedor para los checkboxes -->

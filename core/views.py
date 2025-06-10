@@ -1,6 +1,6 @@
 import pdfplumber
 from django.shortcuts import render, redirect
-from .models import PDF
+from .models import PDF, Carrera
 from io import BytesIO
 from unidecode import unidecode
 from django.http import HttpResponse, JsonResponse
@@ -63,55 +63,63 @@ def procesar_contenido(contenido):
 
 def pdf_to_html(request):
     pdf_ids = request.GET.getlist('pdf_id')
-    print(pdf_ids)  # Obtener lista de IDs de PDF
-    if pdf_ids:
-        identificaciones = []
-        for pdf_id in pdf_ids:
-            try:
-                # Obtener el objeto PDF correspondiente a la ID proporcionada
-                pdf_instance = PDF.objects.get(id=pdf_id)
+    print(pdf_ids)  # Depuración
 
-                # Obtener el texto de evaluación si existe
-                evaluacion_texto = ""
-                if pdf_instance.evaluacion:
-                    evaluacion_texto = pdf_instance.evaluacion.descripcion.replace('\n', '<br>')
-
-                identificacion = {
-                    'nombre': pdf_instance.nombre,
-                    'materia': pdf_instance.materia,
-                    'codigo': pdf_instance.codigo,
-                    'condicion': pdf_instance.condicion,
-                    'carrera': pdf_instance.carrera,
-                    'curso': pdf_instance.curso.nombre if pdf_instance.curso else "",
-                    'semestre': pdf_instance.semestre.nombre if pdf_instance.semestre else "",
-                    'requisitos': pdf_instance.requisitos,
-                    'cargaSemanal': pdf_instance.cargaSemanal,
-                    'cargaSemestral': pdf_instance.cargaSemestral,
-                }
-                secciones = {
-                    'II.FUNDAMENTACIÓN.': pdf_instance.fundamentacion,
-                    'III.OBJETIVOS.': procesar_lista(pdf_instance.objetivos),
-                    'IV.CONTENIDO.': procesar_contenido(pdf_instance.contenido),
-                    'V.METODOLOGÍA.': procesar_lista(pdf_instance.metodologia),
-                    'VI.EVALUACIÓN': evaluacion_texto,
-                    'VII.BIBLIOGRAFÍA.': procesar_lista(pdf_instance.bibliografia),
-                }
-                identificaciones.append({'identificacion': identificacion, 'secciones': secciones})
-                print("Nombre: ", pdf_instance.nombre)
-                print("Materia: ", pdf_instance.materia)
-            except PDF.DoesNotExist:
-                pass  # Manejar la situación en la que el PDF no existe
-
-        # Ordenar identificaciones por el campo 'codigo'
-        identificaciones.sort(key=lambda x: x['identificacion']['codigo'])
-
-        if identificaciones:
-            html_content = render_to_string('pdf_to_html_template.html', {'identificaciones': identificaciones})
-            return HttpResponse(html_content)
-        else:
-            return HttpResponse("No se encontraron PDFs con las IDs proporcionadas.")
-    else:
+    if not pdf_ids:
         return HttpResponse("No se proporcionaron IDs de PDF.")
+
+    identificaciones = []
+
+    for pdf_id in pdf_ids:
+        try:
+            pdf_instance = PDF.objects.get(id=pdf_id)
+
+            evaluacion_texto = ""
+            if pdf_instance.evaluacion:
+                evaluacion_texto = pdf_instance.evaluacion.descripcion.replace('\n', '<br>')
+
+            identificacion = {
+                'nombre': pdf_instance.nombre,
+                'materia': pdf_instance.codigo.nombre if pdf_instance.codigo else "",
+                'codigo': pdf_instance.codigo.codigo if pdf_instance.codigo else "",  # Mostrar el código de materia
+                'condicion': pdf_instance.condicion,
+                'carrera': pdf_instance.id_carrera.nombre if pdf_instance.id_carrera else "",
+                'curso': pdf_instance.curso.nombre if pdf_instance.curso else "",
+                'semestre': pdf_instance.semestre.nombre if pdf_instance.semestre else "",
+                'requisitos': pdf_instance.requisitos,
+                'cargaSemanal': pdf_instance.cargasemanal,
+                'cargaSemestral': pdf_instance.cargasemestral,
+            }
+
+            secciones = {
+                'II.FUNDAMENTACIÓN.': pdf_instance.fundamentacion,
+                'III.OBJETIVOS.': procesar_lista(pdf_instance.objetivos),
+                'IV.CONTENIDO.': procesar_contenido(pdf_instance.contenido),
+                'V.METODOLOGÍA.': procesar_lista(pdf_instance.metodologia),
+                'VI.EVALUACIÓN': evaluacion_texto,
+                'VII.BIBLIOGRAFÍA.': procesar_lista(pdf_instance.bibliografia),
+            }
+
+            identificaciones.append({
+                'identificacion': identificacion,
+                'secciones': secciones
+            })
+
+            # Debug
+            print("Nombre:", pdf_instance.nombre)
+            print("Materia:", pdf_instance.codigo.nombre if pdf_instance.codigo else "")
+
+        except PDF.DoesNotExist:
+            continue  # Ignora PDFs no encontrados
+
+    # Ordenar por código de materia
+    identificaciones.sort(key=lambda x: x['identificacion']['codigo'])
+
+    if identificaciones:
+        html_content = render_to_string('pdf_to_html_template.html', {'identificaciones': identificaciones})
+        return HttpResponse(html_content)
+    else:
+        return HttpResponse("No se encontraron PDFs con las IDs proporcionadas.")
 
 
 def eliminar_encabezados_pies_pagina(page):
@@ -301,16 +309,30 @@ def extraer_valor(linea_actual, linea_siguiente):
     return None
 
 
-def get_materiasf(request, codcarrera):
-    print(codcarrera)
-    materias = list(PDF.objects.filter(codigo__icontains=codcarrera).values())
-    if len(materias) <= 0:
-        data = {'message': "Not Found"}
-    else:
-        data = {'message': "Success", 'materias': materias}
+from django.http import JsonResponse
 
-    return JsonResponse(data)
+
+def get_materiasf(request, codcarrera):
+    print(f"Código recibido: {codcarrera}")
+
+    # Buscar PDFs cuya materia asociada tenga un código que contenga el valor recibido
+    pdfs = PDF.objects.filter(codigo__codigo__icontains=codcarrera).select_related('codigo', 'curso', 'semestre')
+
+    if not pdfs.exists():
+        return JsonResponse({'message': 'Not Found'})
+
+    materias = []
+    for pdf in pdfs:
+        materias.append({
+            'id': pdf.id,  # ID del PDF
+            'materia': pdf.codigo.nombre,  # Nombre de la materia
+            'curso_id': pdf.curso.id if pdf.curso else None,
+            'semestre_id': pdf.semestre.id if pdf.semestre else None,
+        })
+
+    return JsonResponse({'message': 'Success', 'materias': materias})
 
 
 def menu(request):
-    return render(request, 'menu.html', )
+    carreras = Carrera.objects.all()
+    return render(request, 'menu.html', {'carreras': carreras})

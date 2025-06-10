@@ -3,12 +3,12 @@ from django.db import models
 
 class Carrera(models.Model):
     nombre = models.CharField(max_length=100)
-
+    cod_carrera = models.CharField(max_length=45)
     def __str__(self):
         return self.nombre
 
     class Meta:
-        db_table = 'carrera'
+        db_table = 'core_carrera'
 
 
 class Curso(models.Model):
@@ -41,24 +41,37 @@ class Evaluacion(models.Model):
         db_table = 'evaluacion'
 
 
+class Materia(models.Model):
+    codigo = models.CharField(primary_key=True, max_length=100)
+    nombre = models.CharField(max_length=255, blank=True, null=True)
+
+    def __str__(self):
+        return self.nombre
+
+    class Meta:
+        db_table = 'materia'
+
+
 class PDF(models.Model):
-    id_carrera = models.ForeignKey(Carrera, on_delete=models.SET_NULL, null=True, blank=True)
-    nombre = models.CharField(max_length=100, null=True, blank=True)
-    materia = models.CharField(max_length=100, null=True, blank=True)
-    codigo = models.CharField(max_length=100, null=True, blank=True)
-    condicion = models.CharField(max_length=100, null=True, blank=True)
-    carrera = models.CharField(max_length=100, null=True, blank=True)
-    curso = models.ForeignKey(Curso, on_delete=models.SET_NULL, null=True, blank=True)
-    semestre = models.ForeignKey(Semestre, on_delete=models.SET_NULL, null=True, blank=True)
-    requisitos = models.TextField(null=True, blank=True)
-    cargaSemanal = models.CharField(max_length=100, null=True, blank=True)
-    cargaSemestral = models.CharField(max_length=100, null=True, blank=True)
-    fundamentacion = models.TextField(null=True, blank=True)
-    objetivos = models.TextField(null=True, blank=True)
-    contenido = models.TextField(null=True, blank=True)
-    metodologia = models.TextField(null=True, blank=True)
-    evaluacion = models.ForeignKey(Evaluacion, on_delete=models.SET_NULL, null=True, blank=True)
-    bibliografia = models.TextField(null=True, blank=True)
+    id = models.BigAutoField(primary_key=True)
+    nombre = models.CharField(max_length=100, blank=True, null=True)
+    codigo = models.OneToOneField(Materia, models.DO_NOTHING, db_column='codigo')
+    condicion = models.CharField(max_length=100, blank=True, null=True)
+    requisitos = models.TextField(blank=True, null=True)
+    cargasemanal = models.CharField(db_column='cargaSemanal', max_length=100, blank=True,
+                                    null=True)  # Field name made lowercase.
+    cargasemestral = models.CharField(db_column='cargaSemestral', max_length=100, blank=True,
+                                      null=True)  # Field name made lowercase.
+    fundamentacion = models.TextField(blank=True, null=True)
+    objetivos = models.TextField(blank=True, null=True)
+    contenido = models.TextField(blank=True, null=True)
+    metodologia = models.TextField(blank=True, null=True)
+    bibliografia = models.TextField(blank=True, null=True)
+    id_carrera = models.ForeignKey(Carrera, models.DO_NOTHING, blank=True, null=True)
+    curso = models.ForeignKey(Curso, models.DO_NOTHING, blank=True, null=True)
+    semestre = models.ForeignKey(Semestre, models.DO_NOTHING, blank=True, null=True)
+    evaluacion = models.ForeignKey(Evaluacion, models.DO_NOTHING, blank=True, null=True)
+
 
     def __str__(self):
         return self.nombre
